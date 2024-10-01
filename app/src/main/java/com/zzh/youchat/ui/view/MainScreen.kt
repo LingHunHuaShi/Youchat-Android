@@ -16,9 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.zzh.youchat.R
-import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.ui.component.BottomNav
 
 @Composable
@@ -76,7 +74,7 @@ fun MainScreen(
                         onNavigateToSettings = {
                             onNavigateToSettings()
                         },
-                        onExit = {
+                        onNavigateToLogin = {
                             saveLoginStatus(false)
                             onNavigateToLogin()
                         }

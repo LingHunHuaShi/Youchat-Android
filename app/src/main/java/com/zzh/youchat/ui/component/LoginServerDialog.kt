@@ -1,5 +1,6 @@
 package com.zzh.youchat.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,8 @@ fun LoginServerDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val storedAddress = settingsViewModel.serverAddress.collectAsState().value
     var address by remember { mutableStateOf(storedAddress) }
+    val TAG = "Login Server Dialog"
+    Log.d(TAG, "LoginServerDialog: address: $address")
     LoginServerDialogUI(
         onDismiss = onDismiss,
         onConfirm = onConfirm,

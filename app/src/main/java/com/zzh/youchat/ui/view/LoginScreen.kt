@@ -1,7 +1,5 @@
 package com.zzh.youchat.ui.view
 
-import android.content.Context
-import android.graphics.Paint.Cap
 import android.os.Build.VERSION.SDK_INT
 import android.util.Base64
 import android.util.Log
@@ -23,7 +21,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.substring
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,9 +45,10 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
-import com.zzh.youchat.data.entity.Captcha
+import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
+import com.zzh.youchat.network.entity.requestDto.LoginRequest
 import com.zzh.youchat.ui.component.LoginServerDialog
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.random.Random
@@ -59,7 +56,7 @@ import kotlin.random.Random
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit,
+    onNavigateToMain: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val TAG = "Login Screen Debug"
@@ -73,42 +70,63 @@ fun LoginScreen(
 
     val serverAddress by settingsViewModel.serverAddress.collectAsState()
 
-    Log.d(TAG, "LoginScreen88888: ${"http://192.168.101.146".startsWith("http://")}")
+//    Log.d(TAG, "LoginScreen88888: ${"http://192.168.101.146".startsWith("http://")}")
 
     // 使用 LaunchedEffect 来监听 serverAddress 的变化
     LaunchedEffect(serverAddress) {
+        loginViewModel.renewApi()
         Log.d(TAG, "LoginScreen-server: $serverAddress")
-
-        if (serverAddress.startsWith("http://")) {
-            Log.d(TAG, "LoginScreen: 填写正确")
-            loginViewModel.fetchCaptcha(context)
-        } else {
-            Toast.makeText(context, "请先检查登录服务器设置", Toast.LENGTH_SHORT).show()
+        if (serverAddress != "_INIT_ADDRESS_VALUE_"){
+            if (serverAddress.startsWith("http://")) {
+                Log.d(TAG, "LoginScreen: 填写正确")
+                loginViewModel.fetchCaptcha()
+            } else {
+                Toast.makeText(context, "请先检查登录服务器设置", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     val captcha = loginViewModel.captcha.observeAsState()
-    val errMsg = loginViewModel.errMsg.observeAsState()
+    val errMsg by loginViewModel.errMsg.observeAsState()
+
+    errMsg?.let { message ->
+        if (message.isNotEmpty()){
+            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+            // 清空错误消息以避免重复显示
+            loginViewModel.clearErrMsg()
+        }
+    }
 
     LoginScreenUI(
-        onLoginSuccess = onLoginSuccess,
+        onLogin = { request ->
+            loginViewModel.login(request) { loginResponse ->
+                if (loginResponse == null) {
+                    Toast.makeText(context, "登录失败", Toast.LENGTH_SHORT).show()
+                } else {
+                    loginViewModel.saveUserToken(loginResponse.token)
+                    loginViewModel.saveUid(loginResponse.uid)
+                    onNavigateToMain()
+                    Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
+                }
+            }
+        },
         modifier = modifier,
         saveServerAddress = settingsViewModel::saveServerAddress,
+        renewApi = loginViewModel::renewApi,
         imageLoader = imageLoader,
         captcha = captcha.value,
-        errMsg = errMsg.value,
     )
 }
 
 
 @Composable
 fun LoginScreenUI(
-    onLoginSuccess: () -> Unit,
+    onLogin: (loginRequest: LoginRequest) -> Unit,
     modifier: Modifier = Modifier,
     saveServerAddress: (String) -> Unit,
+    renewApi: () -> Unit,
     imageLoader: ImageLoader,
     captcha: Captcha?,
-    errMsg: String?,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -126,8 +144,6 @@ fun LoginScreenUI(
         // 生成一个随机的 ByteArray，长度为 10（可以根据需要调整）
         ByteArray(10).apply { Random.nextBytes(this) }
     }
-
-
 
     Surface(
         modifier = modifier
@@ -226,8 +242,18 @@ fun LoginScreenUI(
             }
             FilledTonalButton(
                 onClick = {
-                    Toast.makeText(context, "模拟登录测试", Toast.LENGTH_SHORT).show()
-                    onLoginSuccess()
+//                    Toast.makeText(context, "模拟登录测试", Toast.LENGTH_SHORT).show()
+                    if (captcha != null) {
+                        if (captchaCode.isNotEmpty()) {
+                            val loginRequest =
+                                LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
+                            onLogin(loginRequest)
+                        } else {
+                            Toast.makeText(context, "请填写验证码", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "请先获取验证码", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -241,6 +267,7 @@ fun LoginScreenUI(
             LoginServerDialog(
                 onConfirm = { address ->
                     saveServerAddress(address)
+                    renewApi()
                     Log.d(TAG, "LoginScreen: $address")
                     showDialog = false
                 },
@@ -257,17 +284,18 @@ fun LoginScreenUI(
 @Composable
 @Preview
 fun LoginScreenPreview() {
-    val captchaExp = Captcha("sdsd", "Rxs")
+    val captchaExp = Captcha("25c0b294-22e5-4a53-bc61-054764363a48",
+        stringResource(R.string.example_captcha_base64))
 
     LoginScreenUI(
-        onLoginSuccess = {},
+        onLogin = {},
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         saveServerAddress = {},
+        renewApi = {},
         imageLoader = LocalContext.current.imageLoader,
         captcha = captchaExp,
-        errMsg = null,
     )
 
 }

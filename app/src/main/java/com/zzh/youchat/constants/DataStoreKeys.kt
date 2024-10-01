@@ -8,4 +8,6 @@ object DataStoreKeys {
     val LOGIN_STATE = booleanPreferencesKey("is_logged_in")
     val USER_TOKEN = stringPreferencesKey("user_token")
     val SERVER_ADDRESS = stringPreferencesKey("server_address")
+    val IS_ADMIN = booleanPreferencesKey("is_admin")
+    val UID = stringPreferencesKey("uid")
 }

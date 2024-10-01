@@ -16,18 +16,51 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zzh.youchat.R
+import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.ui.component.PersonalInfoCard
 import com.zzh.youchat.ui.component.TableRow
 
 @Composable
-fun MinePage(onNavigateToSettings: () -> Unit, onExit: () -> Unit, modifier: Modifier = Modifier) {
+fun MinePage(
+    onNavigateToSettings: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val loginViewModel: LoginViewModel = hiltViewModel()
+    val context = LocalContext.current
+    val uid by loginViewModel.uid.collectAsState()
+
+    MinePageUI(
+        onNavigateToSettings = { onNavigateToSettings() },
+        onExit = {
+            loginViewModel.logout(uid) { isLogoutSuccess ->
+                if (isLogoutSuccess) {
+                    onNavigateToLogin()
+                } else {
+                    Toast.makeText(context, "退出登录失败", Toast.LENGTH_SHORT).show()
+                }
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MinePageUI(
+    onNavigateToSettings: () -> Unit,
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
 
     Surface(
@@ -91,7 +124,9 @@ fun MinePage(onNavigateToSettings: () -> Unit, onExit: () -> Unit, modifier: Mod
                 onClick = { Toast.makeText(context, "还没写", Toast.LENGTH_SHORT).show() }
             )
             FilledTonalButton(
-                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 32.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 32.dp),
                 onClick = { onExit() }
             ) {
                 Text(stringResource(R.string.exit_login))
@@ -104,5 +139,5 @@ fun MinePage(onNavigateToSettings: () -> Unit, onExit: () -> Unit, modifier: Mod
 @Composable
 @Preview
 fun MinePagePreview() {
-    MinePage({}, {}, Modifier.fillMaxSize())
+    MinePageUI({}, {}, Modifier.fillMaxSize())
 }

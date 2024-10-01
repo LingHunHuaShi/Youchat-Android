@@ -1,4 +1,4 @@
-package com.zzh.youchat.data.entity
+package com.zzh.youchat.network.entity
 
 data class ApiResponse<T>(
     val code: Int,

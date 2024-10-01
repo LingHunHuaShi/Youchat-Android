@@ -17,7 +17,7 @@ open class SettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
     var serverAddress  = DataStoreUtils.getServerAddress(context)
-        .stateIn(viewModelScope, SharingStarted.Lazily, "")
+        .stateIn(viewModelScope, SharingStarted.Lazily, "_INIT_ADDRESS_VALUE_")
 
     open fun saveServerAddress(address: String) {
         viewModelScope.launch {

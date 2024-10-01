@@ -15,8 +15,6 @@ import com.zzh.youchat.ui.view.LoginScreen
 import com.zzh.youchat.ui.view.MainScreen
 import com.zzh.youchat.ui.view.SettingsPage
 import kotlinx.serialization.Serializable
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 @Serializable
 object Main
@@ -51,7 +49,7 @@ fun YouChatApp(modifier: Modifier = Modifier) {
         composable<Settings> { SettingsPage(modifier) }
         composable<Login> {
             LoginScreen(
-                onLoginSuccess = {
+                onNavigateToMain = {
                     loginViewModel.saveLoginStatus(true)
                     navController.navigate(Main) {
                         popUpTo(Login) {
