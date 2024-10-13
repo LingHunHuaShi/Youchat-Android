@@ -163,22 +163,24 @@ fun LoginScreenUI(
             OutlinedTextField(
                 value = email,
                 onValueChange = {
-                    email = it
+                    email = it.replace(" ", "")
                 },
                 label = { Text(text = stringResource(R.string.email)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
+                singleLine = true
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = {
-                    password = it
+                    password = it.replace(" ", "")
                 },
                 label = { Text(text = stringResource(R.string.password)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 10.dp),
+                singleLine = true
             )
 
             // 验证码
