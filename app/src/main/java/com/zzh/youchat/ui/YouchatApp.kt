@@ -13,6 +13,7 @@ import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
 import com.zzh.youchat.ui.view.LoginScreen
 import com.zzh.youchat.ui.view.MainScreen
+import com.zzh.youchat.ui.view.RegisterScreen
 import com.zzh.youchat.ui.view.SettingsPage
 import kotlinx.serialization.Serializable
 
@@ -24,6 +25,9 @@ object Settings
 
 @Serializable
 object Login
+
+@Serializable
+object Register
 
 
 @Composable
@@ -59,6 +63,9 @@ fun YouChatApp(modifier: Modifier = Modifier) {
                 },
                 modifier = modifier,
             )
+        }
+        composable<Register> {
+            RegisterScreen()
         }
     }
 

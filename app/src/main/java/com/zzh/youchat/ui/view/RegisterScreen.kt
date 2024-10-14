@@ -20,8 +20,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -45,102 +43,57 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
-import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
-import com.zzh.youchat.exception.YouChatDataException
 import com.zzh.youchat.network.entity.requestDto.LoginRequest
+import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.ui.component.LoginServerDialog
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.random.Random
 
-
 @Composable
-fun LoginScreen(
-    onNavigateToMain: () -> Unit,
+fun RegisterScreen(
     modifier: Modifier = Modifier
 ) {
-    val TAG = "Login Screen Debug"
-
-    val loginViewModel: LoginViewModel = hiltViewModel()
-    val settingsViewModel: SettingsViewModel = hiltViewModel()
     val context = LocalContext.current
     val imageLoader = remember {
         EntryPointAccessors.fromApplication(context, ImageLoaderEntryPoint::class.java).imageLoader()
     }
 
-    val serverAddress by settingsViewModel.serverAddress.collectAsState()
+    val loginViewModel: LoginViewModel = hiltViewModel()
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
 
-//    Log.d(TAG, "LoginScreen88888: ${"http://192.168.101.146".startsWith("http://")}")
+    var captcha = loginViewModel.captcha.observeAsState()
 
-    // 使用 LaunchedEffect 来监听 serverAddress 的变化
-    LaunchedEffect(serverAddress) {
-        loginViewModel.renewApi()
-        Log.d(TAG, "LoginScreen-server: $serverAddress")
-        if (serverAddress != "_INIT_ADDRESS_VALUE_"){
-            if (serverAddress.startsWith("http://")) {
-                Log.d(TAG, "LoginScreen: 填写正确")
-                loginViewModel.fetchCaptcha()
-            } else {
-                Toast.makeText(context, "请先检查登录服务器设置", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    val captcha = loginViewModel.captcha.observeAsState()
-    val errMsg by loginViewModel.errMsg.observeAsState()
-
-    errMsg?.let { message ->
-        if (message.isNotEmpty()){
-            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
-            // 清空错误消息以避免重复显示
-            loginViewModel.clearErrMsg()
-        }
-    }
-
-    LoginScreenUI(
-        onLogin = { request ->
-            if (request.email.isEmpty() || request.password.isEmpty() || request.captchaCode.isEmpty() || request.captchaImgUuid.isEmpty()) {
-                throw YouChatDataException("输入的项不完整，请检查")
-            }
-            loginViewModel.login(request) { loginResponse ->
-                if (loginResponse == null) {
-                    Toast.makeText(context, "登录失败", Toast.LENGTH_SHORT).show()
-                } else {
-                    loginViewModel.saveUserToken(loginResponse.token)
-                    loginViewModel.saveUid(loginResponse.uid)
-                    onNavigateToMain()
-                    Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
-                }
-            }
-        },
+    RegisterScreenUI(
+        onRegister = {},
         modifier = modifier,
         saveServerAddress = settingsViewModel::saveServerAddress,
         renewApi = loginViewModel::renewApi,
         imageLoader = imageLoader,
-        captcha = captcha.value,
+        captcha = captcha.value
     )
 }
 
-
 @Composable
-fun LoginScreenUI(
-    onLogin: (loginRequest: LoginRequest) -> Unit,
-    modifier: Modifier = Modifier,
+fun RegisterScreenUI(
+    onRegister: () -> Unit,
+    modifier:Modifier = Modifier,
     saveServerAddress: (String) -> Unit,
     renewApi: () -> Unit,
     imageLoader: ImageLoader,
     captcha: Captcha?,
 ) {
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordConfirm by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
     var captchaCode by remember { mutableStateOf("") }
+    var passwordCorrespond by remember { mutableStateOf(false) }
+
     var showDialog by remember { mutableStateOf(false) }
-
-    val context = LocalContext.current
-    val TAG = "Login Screen Debug"
-
-    Log.d(TAG, "LoginScreenUI: $captcha")
 
     val gifBase64Bytes = if (captcha != null) {
         Base64.decode(captcha.captchaImg.substring(22), Base64.DEFAULT)
@@ -154,7 +107,7 @@ fun LoginScreenUI(
     ) {
         Column {
             Text(
-                text = stringResource(R.string.login_welcome),
+                text = stringResource(R.string.register),
                 style = TextStyle(
                     fontSize = 36.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -176,6 +129,17 @@ fun LoginScreenUI(
                 singleLine = true
             )
             OutlinedTextField(
+                value = email,
+                onValueChange = {
+                    email = it.replace(" ", "")
+                },
+                label = { Text(text = stringResource(R.string.nickname)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                singleLine = true
+            )
+            OutlinedTextField(
                 value = password,
                 onValueChange = {
                     password = it.replace(" ", "")
@@ -185,6 +149,19 @@ fun LoginScreenUI(
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 singleLine = true
+            )
+            OutlinedTextField(
+                value = passwordConfirm,
+                onValueChange = {
+                    passwordConfirm = it.replace(" ", "")
+                    passwordCorrespond = (passwordConfirm == password)
+                },
+                label = { Text(text = stringResource(R.string.confirm_password)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                singleLine = true,
+                isError = passwordCorrespond
             )
 
             // 验证码
@@ -206,7 +183,7 @@ fun LoginScreenUI(
                     model = ImageRequest.Builder(context)
                         .data(gifBase64Bytes)
                         .decoderFactory(if (SDK_INT >= 28) ImageDecoderDecoder.Factory()
-                         else GifDecoder.Factory())
+                        else GifDecoder.Factory())
                         .build(),
                     contentDescription = "captcha",
                     imageLoader = imageLoader,
@@ -216,22 +193,7 @@ fun LoginScreenUI(
                 )
             }
 
-            // 注册账号与设置登录服务器
             Row {
-                Text(
-                    text = "没有账号？点此注册",
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textDecoration = TextDecoration.Underline
-                    ),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                        .clickable {
-                            Toast
-                                .makeText(context, "register", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                )
                 Box(modifier = Modifier.weight(1f))
                 Text(
                     text = "设置登录服务器",
@@ -246,16 +208,13 @@ fun LoginScreenUI(
                         }
                 )
             }
+
             FilledTonalButton(
                 onClick = {
                     if (captcha != null) {
-                        val loginRequest =
-                            LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
-                            try {
-                                onLogin(loginRequest)
-                            } catch (e: YouChatDataException) {
-                                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                            }
+//                        val loginRequest =
+//                            LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
+//                        onLogin(loginRequest)
                     } else {
                         Toast.makeText(context, "请先获取验证码", Toast.LENGTH_SHORT).show()
                     }
@@ -264,7 +223,7 @@ fun LoginScreenUI(
                     .fillMaxWidth()
                     .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
             ) {
-                Text("登录", style = TextStyle(fontSize = 16.sp))
+                Text(stringResource(R.string.register), style = TextStyle(fontSize = 16.sp))
             }
         }
 
@@ -273,7 +232,6 @@ fun LoginScreenUI(
                 onConfirm = { address ->
                     saveServerAddress(address)
                     renewApi()
-                    Log.d(TAG, "LoginScreen: $address")
                     showDialog = false
                 },
                 onDismiss = {
@@ -281,26 +239,23 @@ fun LoginScreenUI(
                 }
             )
         }
+
     }
 }
 
-
-
-@Composable
 @Preview
-fun LoginScreenPreview() {
+@Composable
+fun RegisterScreenUiPreview() {
     val captchaExp = Captcha("25c0b294-22e5-4a53-bc61-054764363a48",
         stringResource(R.string.example_captcha_base64))
-
-    LoginScreenUI(
-        onLogin = {},
+    RegisterScreenUI(
+        onRegister = {},
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),
         saveServerAddress = {},
         renewApi = {},
-        imageLoader = LocalContext.current.imageLoader,
         captcha = captchaExp,
-    )
-
+        imageLoader = LocalContext.current.imageLoader,
+        )
 }
