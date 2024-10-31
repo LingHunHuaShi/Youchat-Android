@@ -99,7 +99,6 @@ class LoginViewModel @Inject constructor(
                     onResult(response.body()?.data)
                 } else {
                     errMsg.postValue("Code: ${response.code()}; Error: ${response.errorBody()}")
-                    Log.d(TAG, "login error: ${errMsg.value}")
                     onResult(null)
                 }
             } catch (e: Exception) {

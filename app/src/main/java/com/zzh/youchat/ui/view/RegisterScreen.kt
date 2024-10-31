@@ -129,9 +129,9 @@ fun RegisterScreenUI(
                 singleLine = true
             )
             OutlinedTextField(
-                value = email,
+                value = nickname,
                 onValueChange = {
-                    email = it.replace(" ", "")
+                    nickname = it.replace(" ", "")
                 },
                 label = { Text(text = stringResource(R.string.nickname)) },
                 modifier = Modifier
@@ -143,6 +143,7 @@ fun RegisterScreenUI(
                 value = password,
                 onValueChange = {
                     password = it.replace(" ", "")
+                    passwordCorrespond = (passwordConfirm == password)
                 },
                 label = { Text(text = stringResource(R.string.password)) },
                 modifier = Modifier
@@ -171,7 +172,7 @@ fun RegisterScreenUI(
                 OutlinedTextField(
                     value = captchaCode,
                     onValueChange = {
-                        captchaCode = it
+                        captchaCode = it.replace(" ", "")
                     },
                     label = { Text(stringResource(R.string.captcha))},
 

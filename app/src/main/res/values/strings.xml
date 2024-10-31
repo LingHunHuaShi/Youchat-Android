@@ -20,4 +20,6 @@
     <string name="register">注册</string>
     <string name="confirm_password">确认密码</string>
     <string name="nickname">昵称</string>
+    <string name="add_friend">添加好友</string>
+    <string name="menu_button">菜单按钮</string>
 </resources>

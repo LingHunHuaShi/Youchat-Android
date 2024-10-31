@@ -71,14 +71,12 @@ fun LoginScreen(
 
     val serverAddress by settingsViewModel.serverAddress.collectAsState()
 
-//    Log.d(TAG, "LoginScreen88888: ${"http://192.168.101.146".startsWith("http://")}")
-
     // 使用 LaunchedEffect 来监听 serverAddress 的变化
     LaunchedEffect(serverAddress) {
         loginViewModel.renewApi()
         Log.d(TAG, "LoginScreen-server: $serverAddress")
         if (serverAddress != "_INIT_ADDRESS_VALUE_"){
-            if (serverAddress.startsWith("http://")) {
+            if (serverAddress.startsWith("http://") || serverAddress.startsWith("https://")) {
                 Log.d(TAG, "LoginScreen: 填写正确")
                 loginViewModel.fetchCaptcha()
             } else {
@@ -92,8 +90,9 @@ fun LoginScreen(
 
     errMsg?.let { message ->
         if (message.isNotEmpty()){
-            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
             // 清空错误消息以避免重复显示
+            Log.e(TAG, "LoginScreen: $message")
             loginViewModel.clearErrMsg()
         }
     }
@@ -249,12 +248,14 @@ fun LoginScreenUI(
             FilledTonalButton(
                 onClick = {
                     if (captcha != null) {
-                        val loginRequest =
-                            LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
+                        val loginRequest = LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
                             try {
                                 onLogin(loginRequest)
                             } catch (e: YouChatDataException) {
                                 Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                                Log.e(TAG, "Login Error: "+e.message)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Login Error:" + e.message)
                             }
                     } else {
                         Toast.makeText(context, "请先获取验证码", Toast.LENGTH_SHORT).show()
