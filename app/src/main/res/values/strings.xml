@@ -22,4 +22,6 @@
     <string name="nickname">昵称</string>
     <string name="add_friend">添加好友</string>
     <string name="menu_button">菜单按钮</string>
+    <string name="add">添加</string>
+    <string name="add_group">添加群组</string>
 </resources>

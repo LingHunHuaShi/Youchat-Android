@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.zzh.youchat.R
 import com.zzh.youchat.ui.component.BottomNav
+import com.zzh.youchat.ui.component.FloatingActionMenu
 
 @Composable
 fun MainScreen(
@@ -81,9 +82,11 @@ fun MainScreen(
                     )
                 }
             }
+            FloatingActionMenu()
         }
         BottomNav(itemList = itemList, iconList = iconList, selectedPage)
     }
+
 }
 
 @Composable
