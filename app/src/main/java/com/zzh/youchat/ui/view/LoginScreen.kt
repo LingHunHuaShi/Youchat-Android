@@ -45,11 +45,11 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
-import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
 import com.zzh.youchat.exception.YouChatDataException
 import com.zzh.youchat.network.entity.requestDto.LoginRequest
+import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.ui.component.LoginServerDialog
 import dagger.hilt.android.EntryPointAccessors
 import kotlin.random.Random
@@ -66,7 +66,8 @@ fun LoginScreen(
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val context = LocalContext.current
     val imageLoader = remember {
-        EntryPointAccessors.fromApplication(context, ImageLoaderEntryPoint::class.java).imageLoader()
+        EntryPointAccessors.fromApplication(context, ImageLoaderEntryPoint::class.java)
+            .imageLoader()
     }
 
     val serverAddress by settingsViewModel.serverAddress.collectAsState()
@@ -75,7 +76,7 @@ fun LoginScreen(
     LaunchedEffect(serverAddress) {
         loginViewModel.renewApi()
         Log.d(TAG, "LoginScreen-server: $serverAddress")
-        if (serverAddress != "_INIT_ADDRESS_VALUE_"){
+        if (serverAddress != "_INIT_ADDRESS_VALUE_") {
             if (serverAddress.startsWith("http://") || serverAddress.startsWith("https://")) {
                 Log.d(TAG, "LoginScreen: 填写正确")
                 loginViewModel.fetchCaptcha()
@@ -89,7 +90,7 @@ fun LoginScreen(
     val errMsg by loginViewModel.errMsg.observeAsState()
 
     errMsg?.let { message ->
-        if (message.isNotEmpty()){
+        if (message.isNotEmpty()) {
 //            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
             // 清空错误消息以避免重复显示
             Log.e(TAG, "LoginScreen: $message")
@@ -189,13 +190,13 @@ fun LoginScreenUI(
             // 验证码
             Row(
                 modifier = Modifier.height(IntrinsicSize.Min)
-            ){
+            ) {
                 OutlinedTextField(
                     value = captchaCode,
                     onValueChange = {
                         captchaCode = it
                     },
-                    label = { Text(stringResource(R.string.captcha))},
+                    label = { Text(stringResource(R.string.captcha)) },
 
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
@@ -204,8 +205,10 @@ fun LoginScreenUI(
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(gifBase64Bytes)
-                        .decoderFactory(if (SDK_INT >= 28) ImageDecoderDecoder.Factory()
-                         else GifDecoder.Factory())
+                        .decoderFactory(
+                            if (SDK_INT >= 28) ImageDecoderDecoder.Factory()
+                            else GifDecoder.Factory()
+                        )
                         .build(),
                     contentDescription = "captcha",
                     imageLoader = imageLoader,
@@ -248,15 +251,16 @@ fun LoginScreenUI(
             FilledTonalButton(
                 onClick = {
                     if (captcha != null) {
-                        val loginRequest = LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
-                            try {
-                                onLogin(loginRequest)
-                            } catch (e: YouChatDataException) {
-                                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-                                Log.e(TAG, "Login Error: "+e.message)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "Login Error:" + e.message)
-                            }
+                        val loginRequest =
+                            LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
+                        try {
+                            onLogin(loginRequest)
+                        } catch (e: YouChatDataException) {
+                            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                            Log.e(TAG, "Login Error: " + e.message)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Login Error:" + e.message)
+                        }
                     } else {
                         Toast.makeText(context, "请先获取验证码", Toast.LENGTH_SHORT).show()
                     }
@@ -286,12 +290,13 @@ fun LoginScreenUI(
 }
 
 
-
 @Composable
 @Preview
 fun LoginScreenPreview() {
-    val captchaExp = Captcha("25c0b294-22e5-4a53-bc61-054764363a48",
-        stringResource(R.string.example_captcha_base64))
+    val captchaExp = Captcha(
+        "25c0b294-22e5-4a53-bc61-054764363a48",
+        stringResource(R.string.example_captcha_base64)
+    )
 
     LoginScreenUI(
         onLogin = {},

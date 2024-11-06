@@ -25,14 +25,14 @@ fun MainScreen(
     onNavigateToSettings: () -> Unit,
     onNavigateToLogin: () -> Unit,
     saveLoginStatus: (Boolean) -> Unit,
-    modifier: Modifier = Modifier) {
-
+    modifier: Modifier = Modifier
+) {
     val itemList = listOf(
         stringResource(R.string.chat),
         stringResource(R.string.contact),
         stringResource(R.string.mine)
     )
-    val iconList: List<@Composable ()->Unit> = listOf(
+    val iconList: List<@Composable () -> Unit> = listOf(
         {
             Icon(
                 painter = painterResource(R.drawable.ic_chat),
@@ -82,7 +82,23 @@ fun MainScreen(
                     )
                 }
             }
-            FloatingActionMenu()
+            FloatingActionMenu(
+                listOf(
+                    painterResource(R.drawable.ic_add_person),
+                    painterResource(R.drawable.ic_add_group),
+                    painterResource(R.drawable.ic_create_group),
+                ),
+                listOf(
+                    stringResource(R.string.add_friend),
+                    stringResource(R.string.add_group),
+                    stringResource(R.string.create_group),
+                ),
+                listOf(
+                    {},
+                    {},
+                    {},
+                )
+            )
         }
         BottomNav(itemList = itemList, iconList = iconList, selectedPage)
     }

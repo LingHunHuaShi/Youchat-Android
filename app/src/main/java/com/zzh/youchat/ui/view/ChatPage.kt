@@ -11,8 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.zzh.youchat.ui.component.ChatRow
 import com.zzh.youchat.R
+import com.zzh.youchat.ui.component.ChatRow
 import com.zzh.youchat.ui.component.SearchField
 
 @Composable

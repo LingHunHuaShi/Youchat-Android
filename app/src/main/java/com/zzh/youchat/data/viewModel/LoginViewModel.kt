@@ -5,13 +5,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import com.zzh.youchat.data.DataStoreUtils
-import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.network.RetrofitClient
 import com.zzh.youchat.network.api.AuthApiService
 import com.zzh.youchat.network.entity.requestDto.LoginRequest
+import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.network.entity.responseDto.Login
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,7 +40,8 @@ class LoginViewModel @Inject constructor(
     val uid = DataStoreUtils.getUid(context)
         .stateIn(viewModelScope, SharingStarted.Lazily, "_INIT_UID_VALUE_")
 
-    private var authApiService = RetrofitClient.getRetrofitInstance(context, AuthApiService::class.java)
+    private var authApiService =
+        RetrofitClient.getRetrofitInstance(context, AuthApiService::class.java)
 
     fun clearErrMsg() {
         errMsg.postValue(null)

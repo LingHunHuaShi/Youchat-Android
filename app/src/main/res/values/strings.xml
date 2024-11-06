@@ -23,5 +23,7 @@
     <string name="add_friend">添加好友</string>
     <string name="menu_button">菜单按钮</string>
     <string name="add">添加</string>
-    <string name="add_group">添加群组</string>
+    <string name="create_group">创建群组</string>
+    <string name="close">关闭</string>
+    <string name="add_group">搜索群组</string>
 </resources>

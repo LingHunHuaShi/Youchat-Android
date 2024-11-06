@@ -1,6 +1,6 @@
 package com.zzh.youchat.network.entity.responseDto
 
-data class Login (
+data class Login(
     val uid: String,
     val token: String,
     val email: String,

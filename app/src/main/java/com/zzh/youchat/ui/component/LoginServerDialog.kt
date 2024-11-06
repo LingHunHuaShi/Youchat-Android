@@ -42,11 +42,16 @@ fun LoginServerDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
         address = address,
         onValueChange = {
             address = it
-    })
+        })
 }
 
 @Composable
-private fun LoginServerDialogUI(onDismiss: () -> Unit, onConfirm: (String) -> Unit, address: String, onValueChange: (String) -> Unit) {
+private fun LoginServerDialogUI(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+    address: String,
+    onValueChange: (String) -> Unit
+) {
     Dialog(
         onDismissRequest = { onDismiss() }
     ) {

@@ -1,11 +1,7 @@
 package com.zzh.youchat.ui.component
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,10 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,26 +25,30 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zzh.youchat.R
 
 @Composable
 fun FloatingActionMenu(
-
+    menuIcon: List<Painter>,
+    menuText: List<String>,
+    menuOnClick: List<() -> Unit>,
 ) {
     val iconSize = 24.dp
     val fontSize = 16.sp
     val lineHeight = 40.dp
+    val menuItemNumber = menuIcon.size + 1
 
     var isMenuExpanded by remember { mutableStateOf(false) }
-    val cornerRadius by animateDpAsState(if (isMenuExpanded) 28.dp else 16.dp)
+    val cornerRadius by animateDpAsState(if (isMenuExpanded) 12.dp else 16.dp)
     val menuWidth by animateDpAsState(if (!isMenuExpanded) 56.dp else 200.dp)
-    val menuHeight by animateDpAsState(if (!isMenuExpanded) 56.dp else (lineHeight * 3 + 10.dp))
+    val menuHeight by animateDpAsState(if (!isMenuExpanded) 56.dp else (lineHeight * menuItemNumber))
+
 
     Box(
         contentAlignment = Alignment.BottomEnd,
@@ -65,7 +63,7 @@ fun FloatingActionMenu(
                 .clip(RoundedCornerShape(cornerRadius))
                 .then(
                     if (!isMenuExpanded) {
-                        Modifier.clickable{
+                        Modifier.clickable {
                             isMenuExpanded = true
                         }
                     } else {
@@ -76,55 +74,53 @@ fun FloatingActionMenu(
             shadowElevation = 8.dp
         ) {
             if (isMenuExpanded) {
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(vertical = 5.dp, horizontal = 20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.height(lineHeight)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_add_person),
-                            contentDescription = stringResource(R.string.add_friend),
-                            modifier = Modifier.size(iconSize),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                        Box(modifier = Modifier.size(15.dp))
-                        Text(stringResource(R.string.add_friend), fontSize = fontSize)
+                Column {
+                    // 菜单功能按钮
+                    LazyColumn {
+                        items(menuIcon.size) { index ->
+                            Row(
+                                modifier = Modifier
+                                    .height(lineHeight)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        menuOnClick[index]()
+                                    },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(modifier = Modifier.size(20.dp))
+                                Icon(
+                                    painter = menuIcon[index],
+                                    contentDescription = menuText[index],
+                                    modifier = Modifier.size(iconSize),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                                Box(modifier = Modifier.size(15.dp))
+                                Text(menuText[index], fontSize = fontSize)
+                                Box(modifier = Modifier.size(20.dp))
+                            }
+                        }
                     }
+
+                    // 关闭菜单按钮
                     Row(
-                        modifier = Modifier.height(lineHeight)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_add_group),
-                            contentDescription = stringResource(R.string.add_group),
-                            modifier = Modifier.size(iconSize),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                        Box(modifier = Modifier.size(15.dp))
-                        Text(stringResource(R.string.add_group), fontSize = fontSize)
-                    }
-                    Row(
-                        modifier = Modifier.height(lineHeight)
+                        modifier = Modifier
+                            .height(lineHeight)
                             .fillMaxWidth()
-                            .clickable{
+                            .clickable {
                                 isMenuExpanded = false
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Box(modifier = Modifier.size(20.dp))
                         Icon(
                             painter = painterResource(R.drawable.ic_close),
-                            contentDescription = stringResource(R.string.add_group),
+                            contentDescription = stringResource(R.string.close),
                             modifier = Modifier.size(iconSize),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                         Box(modifier = Modifier.size(15.dp))
-                        Text("关闭", fontSize = fontSize)
+                        Text(stringResource(R.string.close), fontSize = fontSize)
+                        Box(modifier = Modifier.size(20.dp))
                     }
                 }
             } else {
@@ -142,5 +138,21 @@ fun FloatingActionMenu(
 @Preview
 @Composable
 fun FloatingActionMenuPreview() {
-    FloatingActionMenu()
+    FloatingActionMenu(
+        listOf(
+            painterResource(R.drawable.ic_add_person),
+            painterResource(R.drawable.ic_add_group),
+            painterResource(R.drawable.ic_create_group),
+        ),
+        listOf(
+            stringResource(R.string.add_friend),
+            stringResource(R.string.add_group),
+            stringResource(R.string.create_group),
+        ),
+        listOf(
+            {},
+            {},
+            {},
+        )
+    )
 }

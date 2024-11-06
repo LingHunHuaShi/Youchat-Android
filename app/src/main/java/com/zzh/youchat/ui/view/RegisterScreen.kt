@@ -2,7 +2,6 @@ package com.zzh.youchat.ui.view
 
 import android.os.Build.VERSION.SDK_INT
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +44,6 @@ import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
 import com.zzh.youchat.data.viewModel.LoginViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
-import com.zzh.youchat.network.entity.requestDto.LoginRequest
 import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.ui.component.LoginServerDialog
 import dagger.hilt.android.EntryPointAccessors
@@ -57,7 +55,8 @@ fun RegisterScreen(
 ) {
     val context = LocalContext.current
     val imageLoader = remember {
-        EntryPointAccessors.fromApplication(context, ImageLoaderEntryPoint::class.java).imageLoader()
+        EntryPointAccessors.fromApplication(context, ImageLoaderEntryPoint::class.java)
+            .imageLoader()
     }
 
     val loginViewModel: LoginViewModel = hiltViewModel()
@@ -78,7 +77,7 @@ fun RegisterScreen(
 @Composable
 fun RegisterScreenUI(
     onRegister: () -> Unit,
-    modifier:Modifier = Modifier,
+    modifier: Modifier = Modifier,
     saveServerAddress: (String) -> Unit,
     renewApi: () -> Unit,
     imageLoader: ImageLoader,
@@ -168,13 +167,13 @@ fun RegisterScreenUI(
             // 验证码
             Row(
                 modifier = Modifier.height(IntrinsicSize.Min)
-            ){
+            ) {
                 OutlinedTextField(
                     value = captchaCode,
                     onValueChange = {
                         captchaCode = it.replace(" ", "")
                     },
-                    label = { Text(stringResource(R.string.captcha))},
+                    label = { Text(stringResource(R.string.captcha)) },
 
                     modifier = Modifier
                         .padding(horizontal = 10.dp)
@@ -183,8 +182,10 @@ fun RegisterScreenUI(
                 AsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(gifBase64Bytes)
-                        .decoderFactory(if (SDK_INT >= 28) ImageDecoderDecoder.Factory()
-                        else GifDecoder.Factory())
+                        .decoderFactory(
+                            if (SDK_INT >= 28) ImageDecoderDecoder.Factory()
+                            else GifDecoder.Factory()
+                        )
                         .build(),
                     contentDescription = "captcha",
                     imageLoader = imageLoader,
@@ -216,6 +217,7 @@ fun RegisterScreenUI(
 //                        val loginRequest =
 //                            LoginRequest(email, password, captcha.captchaImgUuid, captchaCode)
 //                        onLogin(loginRequest)
+                        onRegister()
                     } else {
                         Toast.makeText(context, "请先获取验证码", Toast.LENGTH_SHORT).show()
                     }
@@ -247,8 +249,10 @@ fun RegisterScreenUI(
 @Preview
 @Composable
 fun RegisterScreenUiPreview() {
-    val captchaExp = Captcha("25c0b294-22e5-4a53-bc61-054764363a48",
-        stringResource(R.string.example_captcha_base64))
+    val captchaExp = Captcha(
+        "25c0b294-22e5-4a53-bc61-054764363a48",
+        stringResource(R.string.example_captcha_base64)
+    )
     RegisterScreenUI(
         onRegister = {},
         modifier = Modifier
@@ -258,5 +262,5 @@ fun RegisterScreenUiPreview() {
         renewApi = {},
         captcha = captchaExp,
         imageLoader = LocalContext.current.imageLoader,
-        )
+    )
 }

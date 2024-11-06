@@ -3,23 +3,27 @@ package com.zzh.youchat.ui.component
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.zzh.youchat.R
 
 @Composable
-fun BottomNav(itemList: List<String>, iconList: List<@Composable () -> Unit>, selectedItem: MutableIntState, modifier:Modifier = Modifier) {
+fun BottomNav(
+    itemList: List<String>,
+    iconList: List<@Composable () -> Unit>,
+    selectedItem: MutableIntState,
+    modifier: Modifier = Modifier
+) {
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -49,7 +53,7 @@ fun BottomNavPreview() {
         stringResource(R.string.mine)
     )
 
-    val iconList: List<@Composable ()->Unit> = listOf(
+    val iconList: List<@Composable () -> Unit> = listOf(
         {
             Icon(
                 painter = painterResource(R.drawable.ic_chat),

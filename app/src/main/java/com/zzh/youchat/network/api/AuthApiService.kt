@@ -1,9 +1,9 @@
 package com.zzh.youchat.network.api
 
 import com.zzh.youchat.network.entity.ApiResponse
+import com.zzh.youchat.network.entity.requestDto.LoginRequest
 import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.network.entity.responseDto.Login
-import com.zzh.youchat.network.entity.requestDto.LoginRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
