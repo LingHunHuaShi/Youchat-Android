@@ -10,4 +10,6 @@ object DataStoreKeys {
     val SERVER_ADDRESS = stringPreferencesKey("server_address")
     val IS_ADMIN = booleanPreferencesKey("is_admin")
     val UID = stringPreferencesKey("uid")
+    val EMAIL = stringPreferencesKey("email")
+    val NICKNAME = stringPreferencesKey("nickname")
 }

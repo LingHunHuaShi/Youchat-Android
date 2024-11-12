@@ -42,6 +42,9 @@ fun MinePage(
     val uid by userViewModel.uid.collectAsState()
     val TAG = "MinePage.kt"
 
+    val nickname by userViewModel.nickname.collectAsState()
+    val email by userViewModel.email.collectAsState()
+
     MinePageUI(
         onNavigateToSettings = { onNavigateToSettings() },
         onExit = {
@@ -53,6 +56,8 @@ fun MinePage(
                 }
             }
         },
+        nickname = nickname,
+        email = email,
         modifier = modifier
     )
     Log.d(TAG, "UserToken: ${userViewModel.userToken.collectAsState()}")
@@ -63,7 +68,9 @@ fun MinePage(
 fun MinePageUI(
     onNavigateToSettings: () -> Unit,
     onExit: () -> Unit,
-    modifier: Modifier = Modifier
+    nickname: String,
+    email: String,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
@@ -108,7 +115,7 @@ fun MinePageUI(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Box(modifier = Modifier.height(20.dp))
-                PersonalInfoCard(painterResource(R.drawable.avatar_example), "张三", "12312312312")
+                PersonalInfoCard(painterResource(R.drawable.avatar_example), nickname, email)
                 Text(
                     text = stringResource(R.string.more),
                     style = MaterialTheme.typography.labelLarge,
@@ -143,5 +150,11 @@ fun MinePageUI(
 @Composable
 @Preview
 fun MinePagePreview() {
-    MinePageUI({}, {}, Modifier.fillMaxSize())
+    MinePageUI(
+        {},
+        {},
+        "张三",
+        "123123123",
+        Modifier.fillMaxSize()
+    )
 }

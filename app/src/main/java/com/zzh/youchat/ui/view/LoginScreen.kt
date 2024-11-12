@@ -109,6 +109,9 @@ fun LoginScreen(
                 } else {
                     userViewModel.saveUserToken(loginResponse.token)
                     userViewModel.saveUid(loginResponse.uid)
+                    userViewModel.saveEmail(loginResponse.email)
+                    userViewModel.saveNickname(loginResponse.nickname)
+                    userViewModel.saveIsAdmin(loginResponse.isAdmin)
                     onNavigateToMain()
                     Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
                 }

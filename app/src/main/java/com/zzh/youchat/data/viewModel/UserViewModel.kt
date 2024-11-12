@@ -40,6 +40,15 @@ class UserViewModel @Inject constructor(
     val uid = DataStoreUtils.getUid(context)
         .stateIn(viewModelScope, SharingStarted.Lazily, "_INIT_UID_VALUE_")
 
+    val email = DataStoreUtils.getEmail(context)
+        .stateIn(viewModelScope, SharingStarted.Lazily, "_INIT_EMAIL_VALUE_")
+
+    val nickname = DataStoreUtils.getNickname(context)
+        .stateIn(viewModelScope, SharingStarted.Lazily, "_INIT_NICKNAME_VALUE_")
+
+    val isAdmin = DataStoreUtils.getIsAdmin(context)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
     private var authApiService =
         RetrofitClient.getRetrofitInstance(context, AuthApiService::class.java)
 
@@ -62,6 +71,24 @@ class UserViewModel @Inject constructor(
     fun saveUid(uid: String) {
         viewModelScope.launch {
             DataStoreUtils.saveUid(context, uid)
+        }
+    }
+
+    fun saveEmail(email: String) {
+        viewModelScope.launch {
+            DataStoreUtils.saveEmail(context, email)
+        }
+    }
+
+    fun saveNickname(nickname: String) {
+        viewModelScope.launch {
+            DataStoreUtils.saveNickname(context, nickname)
+        }
+    }
+
+    fun saveIsAdmin(isAdmin: Boolean) {
+        viewModelScope.launch {
+            DataStoreUtils.saveIsAdmin(context, isAdmin)
         }
     }
 

@@ -41,7 +41,7 @@ fun YouChatApp(modifier: Modifier = Modifier) {
     val TAG = "LOGIN_DEBUG"
     Log.d(TAG, "YouChatApplication: $isLoggedIn")
 
-    NavHost(navController, startDestination = if (isLoggedIn.value) Main else Main) {
+    NavHost(navController, startDestination = if (isLoggedIn.value) Main else Login) {
         composable<Main> {
             MainScreen(
                 onNavigateToSettings = { navController.navigate(route = Settings) },

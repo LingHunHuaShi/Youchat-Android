@@ -67,4 +67,27 @@ object DataStoreUtils {
         }
     }
 
+    suspend fun saveEmail(context: Context, email: String) {
+        context.userDataStore.edit { userData ->
+            userData[DataStoreKeys.EMAIL] = email
+        }
+    }
+
+    fun getEmail(context: Context): Flow<String> {
+        return context.userDataStore.data.map { userData ->
+            userData[DataStoreKeys.EMAIL] ?: ""
+        }
+    }
+
+    suspend fun saveNickname(context: Context, nickname: String) {
+        context.userDataStore.edit { userData ->
+            userData[DataStoreKeys.NICKNAME] = nickname
+        }
+    }
+
+    fun getNickname(context: Context): Flow<String> {
+        return context.userDataStore.data.map { userData ->
+            userData[DataStoreKeys.NICKNAME] ?: ""
+        }
+    }
 }
