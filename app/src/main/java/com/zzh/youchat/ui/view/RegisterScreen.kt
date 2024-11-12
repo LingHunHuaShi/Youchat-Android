@@ -42,7 +42,7 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
-import com.zzh.youchat.data.viewModel.LoginViewModel
+import com.zzh.youchat.data.viewModel.UserViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
 import com.zzh.youchat.network.entity.responseDto.Captcha
 import com.zzh.youchat.ui.component.LoginServerDialog
@@ -59,16 +59,16 @@ fun RegisterScreen(
             .imageLoader()
     }
 
-    val loginViewModel: LoginViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
 
-    var captcha = loginViewModel.captcha.observeAsState()
+    var captcha = userViewModel.captcha.observeAsState()
 
     RegisterScreenUI(
         onRegister = {},
         modifier = modifier,
         saveServerAddress = settingsViewModel::saveServerAddress,
-        renewApi = loginViewModel::renewApi,
+        renewApi = userViewModel::renewApi,
         imageLoader = imageLoader,
         captcha = captcha.value
     )

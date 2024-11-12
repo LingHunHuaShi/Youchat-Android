@@ -45,7 +45,7 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.zzh.youchat.R
 import com.zzh.youchat.data.ImageLoaderEntryPoint
-import com.zzh.youchat.data.viewModel.LoginViewModel
+import com.zzh.youchat.data.viewModel.UserViewModel
 import com.zzh.youchat.data.viewModel.SettingsViewModel
 import com.zzh.youchat.exception.YouChatDataException
 import com.zzh.youchat.network.entity.requestDto.LoginRequest
@@ -62,7 +62,7 @@ fun LoginScreen(
 ) {
     val TAG = "Login Screen Debug"
 
-    val loginViewModel: LoginViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val context = LocalContext.current
     val imageLoader = remember {
@@ -74,27 +74,27 @@ fun LoginScreen(
 
     // 使用 LaunchedEffect 来监听 serverAddress 的变化
     LaunchedEffect(serverAddress) {
-        loginViewModel.renewApi()
+        userViewModel.renewApi()
         Log.d(TAG, "LoginScreen-server: $serverAddress")
         if (serverAddress != "_INIT_ADDRESS_VALUE_") {
             if (serverAddress.startsWith("http://") || serverAddress.startsWith("https://")) {
                 Log.d(TAG, "LoginScreen: 填写正确")
-                loginViewModel.fetchCaptcha()
+                userViewModel.fetchCaptcha()
             } else {
                 Toast.makeText(context, "请先检查登录服务器设置", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    val captcha = loginViewModel.captcha.observeAsState()
-    val errMsg by loginViewModel.errMsg.observeAsState()
+    val captcha = userViewModel.captcha.observeAsState()
+    val errMsg by userViewModel.errMsg.observeAsState()
 
     errMsg?.let { message ->
         if (message.isNotEmpty()) {
 //            Toast.makeText(LocalContext.current, message, Toast.LENGTH_SHORT).show()
             // 清空错误消息以避免重复显示
             Log.e(TAG, "LoginScreen: $message")
-            loginViewModel.clearErrMsg()
+            userViewModel.clearErrMsg()
         }
     }
 
@@ -103,12 +103,12 @@ fun LoginScreen(
             if (request.email.isEmpty() || request.password.isEmpty() || request.captchaCode.isEmpty() || request.captchaImgUuid.isEmpty()) {
                 throw YouChatDataException("输入的项不完整，请检查")
             }
-            loginViewModel.login(request) { loginResponse ->
+            userViewModel.login(request) { loginResponse ->
                 if (loginResponse == null) {
                     Toast.makeText(context, "登录失败", Toast.LENGTH_SHORT).show()
                 } else {
-                    loginViewModel.saveUserToken(loginResponse.token)
-                    loginViewModel.saveUid(loginResponse.uid)
+                    userViewModel.saveUserToken(loginResponse.token)
+                    userViewModel.saveUid(loginResponse.uid)
                     onNavigateToMain()
                     Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
                 }
@@ -116,7 +116,7 @@ fun LoginScreen(
         },
         modifier = modifier,
         saveServerAddress = settingsViewModel::saveServerAddress,
-        renewApi = loginViewModel::renewApi,
+        renewApi = userViewModel::renewApi,
         imageLoader = imageLoader,
         captcha = captcha.value,
     )

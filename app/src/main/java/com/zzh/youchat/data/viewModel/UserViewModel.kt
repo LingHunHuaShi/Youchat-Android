@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
+class UserViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val imageLoader: ImageLoader,
 ) : ViewModel() {

@@ -1,5 +1,6 @@
 package com.zzh.youchat.ui.view
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zzh.youchat.R
-import com.zzh.youchat.data.viewModel.LoginViewModel
+import com.zzh.youchat.data.viewModel.UserViewModel
 import com.zzh.youchat.ui.component.PersonalInfoCard
 import com.zzh.youchat.ui.component.TableRow
 
@@ -36,14 +37,15 @@ fun MinePage(
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val loginViewModel: LoginViewModel = hiltViewModel()
+    val userViewModel: UserViewModel = hiltViewModel()
     val context = LocalContext.current
-    val uid by loginViewModel.uid.collectAsState()
+    val uid by userViewModel.uid.collectAsState()
+    val TAG = "MinePage.kt"
 
     MinePageUI(
         onNavigateToSettings = { onNavigateToSettings() },
         onExit = {
-            loginViewModel.logout(uid) { isLogoutSuccess ->
+            userViewModel.logout(uid) { isLogoutSuccess ->
                 if (isLogoutSuccess) {
                     onNavigateToLogin()
                 } else {
@@ -53,6 +55,8 @@ fun MinePage(
         },
         modifier = modifier
     )
+    Log.d(TAG, "UserToken: ${userViewModel.userToken.collectAsState()}")
+
 }
 
 @Composable
