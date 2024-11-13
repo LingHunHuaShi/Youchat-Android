@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -26,8 +28,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,6 +106,9 @@ fun RegisterScreenUI(
         ByteArray(10).apply { Random.nextBytes(this) }
     }
 
+    var passwordVisible by remember { mutableStateOf(false) }
+
+
     Surface(
         modifier = modifier
     ) {
@@ -148,7 +156,18 @@ fun RegisterScreenUI(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
-                singleLine = true
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible }
+                    ) {
+                        Icon(
+                            painter = if (passwordVisible) painterResource(R.drawable.ic_invisible) else painterResource(R.drawable.ic_visible),
+                            contentDescription = stringResource(R.string.display_or_hide_password)
+                        )
+                    }
+                }
             )
             OutlinedTextField(
                 value = passwordConfirm,
@@ -161,7 +180,18 @@ fun RegisterScreenUI(
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
                 singleLine = true,
-                isError = passwordCorrespond
+                isError = passwordCorrespond,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible }
+                    ) {
+                        Icon(
+                            painter = if (passwordVisible) painterResource(R.drawable.ic_invisible) else painterResource(R.drawable.ic_visible),
+                            contentDescription = stringResource(R.string.display_or_hide_password)
+                        )
+                    }
+                }
             )
 
             // 验证码

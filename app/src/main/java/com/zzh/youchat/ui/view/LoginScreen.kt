@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -29,8 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +63,7 @@ import kotlin.random.Random
 @Composable
 fun LoginScreen(
     onNavigateToMain: () -> Unit,
+    onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val TAG = "Login Screen Debug"
@@ -117,6 +123,7 @@ fun LoginScreen(
                 }
             }
         },
+        onNavigateToRegister = onNavigateToRegister,
         modifier = modifier,
         saveServerAddress = settingsViewModel::saveServerAddress,
         renewApi = userViewModel::renewApi,
@@ -129,6 +136,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenUI(
     onLogin: (loginRequest: LoginRequest) -> Unit,
+    onNavigateToRegister: () -> Unit,
     modifier: Modifier = Modifier,
     saveServerAddress: (String) -> Unit,
     renewApi: () -> Unit,
@@ -139,6 +147,8 @@ fun LoginScreenUI(
     var password by remember { mutableStateOf("") }
     var captchaCode by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+
+    var passwordVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val TAG = "Login Screen Debug"
@@ -187,7 +197,18 @@ fun LoginScreenUI(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
-                singleLine = true
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible }
+                    ) {
+                        Icon(
+                            painter = if (passwordVisible) painterResource(R.drawable.ic_invisible) else painterResource(R.drawable.ic_visible),
+                            contentDescription = stringResource(R.string.display_or_hide_password)
+                        )
+                    }
+                }
             )
 
             // 验证码
@@ -232,9 +253,10 @@ fun LoginScreenUI(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 10.dp)
                         .clickable {
-                            Toast
-                                .makeText(context, "register", Toast.LENGTH_SHORT)
-                                .show()
+//                            Toast
+//                                .makeText(context, "register", Toast.LENGTH_SHORT)
+//                                .show()
+                            onNavigateToRegister()
                         }
                 )
                 Box(modifier = Modifier.weight(1f))
@@ -303,6 +325,7 @@ fun LoginScreenPreview() {
 
     LoginScreenUI(
         onLogin = {},
+        onNavigateToRegister = {},
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface),

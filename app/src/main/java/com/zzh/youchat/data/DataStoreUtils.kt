@@ -39,7 +39,7 @@ object DataStoreUtils {
 
     fun getServerAddress(context: Context): Flow<String> {
         return context.settingsDataStore.data.map { settings ->
-            settings[DataStoreKeys.SERVER_ADDRESS] ?: "http://127.0.0.1"
+            settings[DataStoreKeys.SERVER_ADDRESS] ?: "http://youchat.hua4.xyz"
         }
     }
 

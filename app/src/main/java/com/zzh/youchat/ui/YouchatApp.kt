@@ -61,6 +61,13 @@ fun YouChatApp(modifier: Modifier = Modifier) {
                         }
                     }
                 },
+                onNavigateToRegister = {
+                    navController.navigate(Register) {
+                        popUpTo(Register) {
+                            inclusive = true
+                        }
+                    }
+                },
                 modifier = modifier,
             )
         }

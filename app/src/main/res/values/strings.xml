@@ -26,4 +26,5 @@
     <string name="create_group">创建群组</string>
     <string name="close">关闭</string>
     <string name="add_group">搜索群组</string>
+    <string name="display_or_hide_password">显示/隐藏密码</string>
 </resources>
