@@ -98,11 +98,9 @@ class UserViewModel @Inject constructor(
     }
 
     fun fetchCaptcha() {
-        Log.d(TAG, "fetchCaptcha11: ")
         viewModelScope.launch {
             try {
                 val response = authApiService.getCaptcha()
-                Log.d(TAG, "fetchCaptcha22: ")
                 if (response.isSuccessful) {
                     captcha.postValue(response.body()?.data)
                 } else {
@@ -110,7 +108,7 @@ class UserViewModel @Inject constructor(
                     Log.d(TAG, "fetchCaptcha error: ${errMsg.value}")
                 }
             } catch (e: Exception) {
-                errMsg.postValue("Error: ${e.message}")
+                errMsg.postValue(e.message)
                 Log.d(TAG, "fetchCaptcha: ${e.message}")
             }
         }
@@ -125,11 +123,12 @@ class UserViewModel @Inject constructor(
                     Log.d(TAG, "login response body: ${response.body()}")
                     onResult(response.body()?.data)
                 } else {
-                    errMsg.postValue("Code: ${response.code()}; Error: ${response.errorBody()}")
+                    Log.d(TAG, "login response msg: ${response.body()?.msg}")
+                    errMsg.postValue(response.body()?.msg)
                     onResult(null)
                 }
             } catch (e: Exception) {
-                errMsg.postValue("Error: ${e.message}")
+                errMsg.postValue(e.message)
                 Log.d(TAG, "login error: ${errMsg.value}")
             }
         }

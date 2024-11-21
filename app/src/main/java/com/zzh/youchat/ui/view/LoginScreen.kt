@@ -111,7 +111,12 @@ fun LoginScreen(
             }
             userViewModel.login(request) { loginResponse ->
                 if (loginResponse == null) {
-                    Toast.makeText(context, "登录失败", Toast.LENGTH_SHORT).show()
+                    val errorMessage = when(errMsg) {
+                        "Incorrect username or password" -> context.getString(R.string.incorrect_username_or_password)
+                        "Incorrect captcha code" -> context.getString(R.string.incorrect_captcha)
+                        else -> errMsg
+                    }
+                    Toast.makeText(context, "登录失败 $errorMessage", Toast.LENGTH_SHORT).show()
                 } else {
                     userViewModel.saveUserToken(loginResponse.token)
                     userViewModel.saveUid(loginResponse.uid)
